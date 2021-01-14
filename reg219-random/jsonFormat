@@ -1,0 +1,26 @@
+{
+    "food_name" : "my food name",        // a string
+    "res_name" : "my restaurant name",   // a string
+    "price" : 10, // a number
+    "rating" : 4, // a number 1 - 5
+    // following are all boolean indicating yes/no to each food allergy
+    "gluten" : true,     // yes, this food is gluten-free
+    "dairy" : true,      // yes, this food is dairy-free
+    "vegan" : true,      // yes, this food is vegen
+    "vegetarian" : true, // yes, this food is vegetarian
+    "halal" : true      // tes, this food is halal
+}
+
+//note that comment are actually not allowed in actual JSON object,
+//use following one if you guys want to copy
+{
+	"food_name": "my food name",
+	"res_name": "my restaurant name",
+	"price": 10,
+	"rating": 4,
+	"gluten": true,
+	"dairy": true,
+	"vegan": true,
+	"vegetarian": true,
+	"halal": true
+}

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- link the css sheet -->
+    <link rel="stylesheet" href="modal.css">
+    <link rel="stylesheet" href="main.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    <!-- <script src="modal.js"></script> -->
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>My 331 Photos</title>
+</head>
+
+<body>
+    <!-- banner -->
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1 id="banner">Foodterist</h1>
+            <p>enjoy the food</p>
+        </div>
+    </div>
+
+    <!-- navigation bar -->
+    <div id="navbar">
+        <a class="active" href="./main.html">Home</a>
+        <a href="./upload.html">Upload</a>
+        <a class="menu" href="./index.html">Filter</a>
+    </div>
+
+    <!-- image table -->
+    <div class="image_table"></div>
+
+    <!-- modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <!-- populating the image table with photo from database -->
+    <script type="text/javascript">
+        var restaurant = getUrlParam('resname','Empty').replace(/%20/g, " ").replace(/%27/g, "'");
+        document.getElementById("banner").textContent = restaurant;
+        hold100millisec();
+        async function hold100millisec() {
+
+            let promise = new Promise((resolve, reject) => {
+                getIP();
+                // console.log(myIP);
+                setTimeout(() => resolve("done!"), 500)
+            });
+
+            let result = await promise; // wait until the promise resolves (*)
+            console.log(myIP);
+            logit(0, ip2int(myIP), "PAGE: restaurant <" + restaurant + "> is loaded");
+        };
+
+
+        function fetchPhotos() {
+            // counter to check what column a photo will go
+            var id_des_list = [];
+
+            // get column 1
+            // var $collumn_div1 = $(".column1");
+            // just in case there's anything still in the thumbnails div, clear it out
+            // $collumn_div1.empty();
+
+            // get column 2
+            // var $collumn_div2 = $(".column2");
+            // just in case there's anything still in the thumbnails div, clear it out
+            // $collumn_div2.empty();
+
+            // get column 3
+            // var $collumn_div3 = $(".column3");
+            // just in case there's anything still in the thumbnails div, clear it out
+            // $collumn_div3.empty();
+
+            // apply filter before load???
+            // 1. get all photos id
+            // 2. for each id:
+            // 3.       get_description(id)
+            // 4.       apply filter
+            // 5.           if it pass, keep it in id_list of {list of 'id'}
+            // 6. call get_all_thumbnail()
+            // 7. if val.id is in id_list
+            // 8.       append it to image_table
+
+            // get all photos id
+            // console.log(typeof id_des_list);
+            $endpoint = $path_to_backend + 'getPhotos.php?grp_id=0';
+            $.getJSON($endpoint, function (data) {
+                console.log("MAIN: retrieve all id");
+                jQuery.each(data, function (key, val) {
+                    id_des_list.push({
+                        photo_id: val.id
+                        // photo_des: "json"
+                    });
+                });
+            }).done(function () {
+                console.log("MAIN: start populating");
+                // get_description for each id
+                id_des_list.forEach(function (object) {
+
+                    $endpoint = $path_to_backend + 'viewPhoto.php?id=' + object.photo_id;
+                    $.getJSON($endpoint, function (data) {
+                        jQuery.each(data, function (key, val) {
+                            // console.log("id " + object.photo_id + " : " + val.description);
+
+                            // parse the json
+                            var temp = JSON.parse(val.description);
+
+                            $.extend(object, temp);
+                            // console.log(object);
+
+
+                        });
+                    });
+                });
+            });
+
+
+
+            // apply filter
+            wait1sec(id_des_list);
+
+
+        };
+
+        async function wait1sec(id_des_list) {
+
+            let promise = new Promise((resolve, reject) => {
+                setTimeout(() => resolve("done!"), 1000)
+            });
+
+            let result = await promise; // wait until the promise resolves (*)
+            applyfilter(id_des_list);
+        };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        };
+        function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+        function getUrlParam(parameter, defaultvalue){
+            var urlparameter = defaultvalue;
+            if(window.location.href.indexOf(parameter) > -1){
+                urlparameter = getUrlVars()[parameter];
+            }
+            return urlparameter;
+        };
+
+        function applyfilter(id_des_list) {
+            var count = 0;
+
+            console.log("MAIN: applying filter");
+            // console.log(id_des_list);
+
+            function subset_resname(object) {
+                var result = {};
+                result[object.photo_id] = object.res_name;
+                return result;
+            };
+            function subset_price(object) {
+                var result = {};
+                result[object.photo_id] = object.price;
+                return result;
+            };
+            function subset(object) {
+                var result = {};
+                var detail = {};
+
+                for (i in object) {
+                    
+                    detail[i] = object[i];
+                }
+                result[object.photo_id] = detail;
+                return result;
+            };
+
+
+
+            // console.log("MAIN: TEST");
+            // console.log(test_list);
+            var valid_list = id_des_list.filter(item => item.rating >= min_rating_lvl);
+            // console.log(typeof valid_list);
+            
+
+            valid_list = valid_list.filter(item => item.res_name.toLowerCase() === restaurant.toLowerCase());
+
+            var temp = valid_list;
+            valid_list = valid_list.map(subset_resname);
+            var price_list = temp.map(subset_price);
+            var full_list = temp.map(subset);
+            // console.log("DEBUG: list = " + valid_list);
+            // console.log("DEBUG: list = " + JSON.stringify(valid_list));
+            temp = {};
+            for (i in valid_list) {
+                // console.log(valid_list[i]);
+                $.extend(temp, valid_list[i]);
+            }
+            valid_list = temp
+
+            temp = {};
+            for (i in price_list) {
+                // console.log(valid_list[i]);
+                $.extend(temp, price_list[i]);
+            }
+            price_list = temp;
+
+            temp = {};
+            for (i in full_list) {
+                // console.log(valid_list[i]);
+                $.extend(temp, full_list[i]);
+            }
+            full_list = temp;
+            // done applying filter
+
+
+            console.log("loading image");
+
+            shuffleArray(temp);
+
+            // retrieve images from the database
+            $endpoint = $path_to_backend + 'getPhotos.php?grp_id=0';
+            $.getJSON($endpoint, function (data) {
+                jQuery.each(data, function (key, val) {
+
+                    // if val.id is in valid_list then append photo
+                    // if (true) {
+                        if (val.id.toString() in valid_list) {
+
+                        // add cell to the grid
+                        jQuery('<div/>', {
+                            id: 'cell' + count,
+                            "class": 'table_cell',
+                        }).appendTo('.image_table');
+
+                        // modal component
+                        var modal = document.getElementById("myModal");
+                        var modalImg = document.getElementById("img01");
+                        var captionText = document.getElementById("caption");
+                        var thing = full_list[val.id.toString()];
+
+                        // add image to the cell
+                        $("<img />")
+                            .attr("src", $path_to_backend + val.tn_src)
+                            .attr("id", val.id)
+                            .appendTo('#cell' + count)
+                            .attr("class", "tn")
+                            // .wrap('<a href="viewPhoto.html?id=' + val.id + '"></a>');
+                            .click(function () {
+                                // modal logic
+                                var photo_id = val.id;
+		                        $endpoint = $path_to_backend + 'viewPhoto.php?id=' + photo_id;
+		                        $.getJSON($endpoint, function(data)
+                                {
+                                    jQuery.each(data, function(key, val)
+                                    {
+                                        modalImg.src = $path_to_backend + val.src;
+
+                                        
+
+                                        var string = "";
+                                        string += "name: " + thing["food_name"];
+                                        // note the <br> is equal to newline
+                                        string += "<br>restaurant: " + thing["res_name"];
+
+                                        captionText.innerHTML = string;
+
+                                    });
+                                });
+
+                                modal.style.display = "block";
+                            });
+
+                        // add restaurant name to the cell
+                        jQuery('<div/>', {
+                            "class": 'table_cell_restaurant',
+                            text: valid_list[val.id.toString()]
+                        }).appendTo('#cell' + count).wrap('<a href="./upload.html"></a>');
+
+                        // check price level of the food
+                        var dollar_sign = "";
+                        if(price_list[val.id.toString()] <= 10) {
+                            dollar_sign = "$";
+                        }
+                        else if (price_list[val.id.toString()] <= 20) {
+                            dollar_sign = "$$";
+                        }
+                        else {
+                            dollar_sign = "$$";
+                        }
+                        // add dollar sign
+                        jQuery('<div/>', {
+                            "class": 'price_overlay',
+                            text: dollar_sign,
+                            id: "dollar_sign" +  val.id,
+                        }).appendTo('#cell' + count);
+
+                        // $('#dollar_sign' + val.id).append('<style>#dollar_sign' + val.id +':hover:after {background-color : red;}</style>')
+                        $("#dollar_sign" +  val.id).mouseover(function () {
+                            $(this).text("$" + price_list[val.id.toString()]);
+                        }).mouseout(function () {
+                            $(this).text(dollar_sign);
+                        });
+
+
+                        count++;
+                    }
+
+                });
+            });
+
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+            var modal = document.getElementById("myModal");
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+        };
+        $(document).ready(fetchPhotos());
+        $(".hero-image").on('click', function () {
+                logit(0, ip2int(myIP), "ACTION: -mainpage- banner is clicked");
+                console.log("logged");
+            });
+        
+    </script>
+
+    <!-- <h1>Upload a Photo</h1>
+
+    <form name="uploader" id="uploader" enctype="multipart/form-data">
+        <input name="fupload" type="file" />
+        <p><label for="description">Enter a Description: </label>
+            <textarea rows="6" cols="50" id="description" name="description"></textarea></p>
+        <input type="button" value="Upload Photo" id="upload_button">
+    </form>
+    <progress value="" max=""></progress>
+
+    <script type="text/javascript">
+        // make the default
+
+        // verification for the file
+        $(':file').on('change', function () {
+            var file = this.files[0];
+            if (file.size > 10485760) {
+                alert('Max upload size is 10 MB.');
+                $(':file').val('');
+            }
+            // alert(file.name);
+            // alert(file.type);
+        });
+        // Get the button that opens the modal
+        var upload_button = document.getElementById("upload_button");
+        upload_button.onclick = function () {
+            // update the object
+
+            // turn it into string JSON.stringify
+            var jsonString = JSON.stringify(whateverJSONobject);
+
+
+            // for data, we want to submit the photo and the description
+            var photoFormData = new FormData(document.forms['uploader']);
+            photoFormData.set('desscription', jsonString);
+            // include the group ID
+            photoFormData.append('grp_id', 0);
+            $.ajax({
+                url: $path_to_backend + 'uploadPhoto.php',
+                type: 'POST',
+                data: photoFormData,
+                // responseType: 'application/json',
+
+                // some flags for jQuery
+                cache: false,
+                contentType: false,
+                processData: false,
+
+                // Custom XMLHttpRequest
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        // For handling the progress of the upload
+                        myXhr.upload.addEventListener('progress', function (e) {
+                            if (e.lengthComputable) {
+                                $('progress').attr({    
+                                    value: e.loaded,
+                                    max: e.total,
+                                });
+                            }
+                        }, false);
+                    }
+                    return myXhr;
+                }
+            })
+                .done(function () {
+                    // let user know upload finished
+                    alert("File uploaded!");
+                    // refresh photos
+                    fetchPhotos();
+                    // clear the upload form
+                    $(':file').val('');
+                    $('#description').val('');
+                });
+        }
+    </script> -->
+
+    <!-- implementing 'sticky' navigation bar -->
+    <script>
+        window.onscroll = function () { myFunction() };
+
+        var navbar = document.getElementById("navbar");
+        var sticky = navbar.offsetTop;
+
+        function myFunction() {
+            if (window.pageYOffset >= sticky) {
+                navbar.classList.add("sticky")
+            } else {
+                navbar.classList.remove("sticky");
+            }
+        }
+    </script>
+
+
+</body>
+
+</html>

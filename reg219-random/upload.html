@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="index.css"> <!-- link the css sheet -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="config.js"></script>
+    <link href="css/select2.min.css" rel="stylesheet" />
+    <script src="js/select2.min.js"></script>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Upload a Photo</title>
+</head>
+
+
+
+<body>
+
+
+<!-- banner -->
+<div class="hero-image">
+    <div class="hero-text">
+        <h1>Foodterist</h1>
+    </div>
+</div>
+
+<!-- navigation bar -->
+<div id="navbar">
+  <div class="top-right">
+    <a href="main.html" id="skip_link"><i>Go Back</i></a>
+  </div>
+</div>    
+
+ <form name="uploader" id="uploader" enctype="multipart/form-data">
+        <input name="fupload" type="file" />
+
+
+        <p><label for="description">Choose a food or enter a new one: </label>
+            <!---<textarea rows="6" cols="50" id="description" name="description"></textarea></p>--->
+
+            <!---<select class="myselect" style="width:175px;" id = "food_name" name="description">
+                <option>chicken</option>
+                <option>pasta</option>
+                <option>sandwich</option>
+                <option>New food</option>
+                </select>--->
+
+                <select id="chooseFood" class="js-example-basic-single" style="width:175px;" type="text" >
+                    <option>Chicken</option>
+                    <option>Pasta</option>
+                    <option>Sandwich</option>
+                  </select>
+                  <br>
+                  <input id="new-food" type="text" />
+                  <button type="button" id="btn-add-food">Add new food</button>
+
+            <p></p>   
+
+            <textarea rows="1" cols="25" id="res_name" name="res_name" placeholder="Name of restaurant"></textarea></p>
+            <textarea rows="1" cols="25" id="price" name="price" placeholder="Price"></textarea></p>    
+            <textarea rows="1" cols="25" id="rating" name="rating" placeholder="Rating (1-5)"></textarea></p>  
+
+            <p><label for="dietaryRestrictions">Dietary restrictions: <br /></label>
+                <input type="checkbox" id = "glutenFree" name="glutenFree" value="false"> Gluten-free<br>
+                <input type="checkbox" id = "dairyFree" name="dairyFree" value="false"> Dairy-free<br>
+                <input type="checkbox" id = "vegan" name="vegan" value="false"> Vegan<br>
+                <input type="checkbox" id = "vegetarian" name="vegetarian" value="false"> Vegetarian<br>
+                <input type="checkbox" id = "halal" name="halal" value="false"> Halal<br>
+               
+                <input type="button" id ="uploadButton" value="Upload Photo">
+
+
+
+    </form>
+
+    <progress value="" max=""></progress>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+        $('.myselect').select2();
+        })
+    </script>
+    </script>
+
+    <script type="text/javascript">
+
+       /* var newFlag = 0;
+        $('#food_name')
+            .select2()
+            .on('select2:open', () => {
+                newFlag++;
+                $(".select2-results:not(:has(a))").append('<a href="#newOption" id="newOption" style="padding: 6px;height: 20px;display: inline-table;">Create new item</a>');
+                if (newFlag == 1)
+                {
+                //var newval = prompt("Enter new value: ");
+                //$(".select2-results").append('<option>taco</option>').val(newval);
+                }
+        })*/
+
+        $('#newOption').on('click', function()
+        {
+            $(".mySelect")
+                .append($("<option></option>")
+                .attr("value", "taco" )
+                .text("taco" ));
+        })
+
+        $("#vegan").on('change', function() {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+        }
+        }); 
+        $("#vegetarian").on('change', function() {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+        }
+  
+  $('#checkbox-value').text($('#vegetarian').val());
+});     
+
+        $("#glutenFree").on('change', function() {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+        }
+        }); 
+
+        $("#dairyFree").on('change', function() {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+        }
+        }); 
+
+        $("#halal").on('change', function() {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+        }
+        }); 
+
+    $("#btn-add-food").on("click", function(){
+      var newFoodVal = $("#new-food").val();
+      // Set the value, creating a new option if necessary
+      if ($("#chooseFood").find("option[value='" + newFoodVal + "']").length) {
+        $("#chooseFood").val(newfoodVal).trigger("change");
+      } else { 
+        // Create the DOM option that is pre-selected by default
+        var newFood = new Option(newFoodVal, newFoodVal, true, true);
+        // Append it to the select
+        $("#chooseFood").append(newFood).trigger('change');
+      } 
+    });  
+
+    /*
+
+    $(document).ready(function() {
+    $("#state").select2({
+      tags: true
+    });
+      
+    $("#btn-add-state").on("click", function(){
+      var newStateVal = $("#new-state").val();
+      // Set the value, creating a new option if necessary
+      if ($("#state").find("option[value='" + newStateVal + "']").length) {
+        $("#state").val(newStateVal).trigger("change");
+      } else { 
+        // Create the DOM option that is pre-selected by default
+        var newState = new Option(newStateVal, newStateVal, true, true);
+        // Append it to the select
+        $("#state").append(newState).trigger('change');
+      } 
+    });  
+});
+
+
+    */
+
+
+        // verification for the file
+        $(':file').on('change', function() 
+        {   
+            var file = this.files[0];
+            if (file.size > 10485760)
+            {
+                alert('Max upload size is 10 MB.');
+                $(':file').val('');
+            }
+            // alert(file.name);
+            // alert(file.type);
+        });
+
+        //$(':button').on('click', function() 
+        $('#uploadButton').on('click', function()
+        {
+            // for data, we want to submit the photo and the description
+            var photoFormData = new FormData(document.forms['uploader']);
+            // include the group ID
+            var price = parseFloat($("#price").val());
+            //var food_name = $("#food_name").val();
+            var food_name = $("#chooseFood").val();
+            var res_name = $("#res_name").val();
+            var rating = $("#rating").val();
+            var gluten = $("#glutenFree").val();
+            var dairy = $("#dairyFree").val();
+            var vegan = $("#vegan").val();
+            var vegetarian = $("#vegetarian").val();
+            var halal = $("#halal").val();
+
+
+
+
+
+
+            var json = {
+                "food_name" : food_name,
+                "res_name" : res_name,
+                "price" : price,
+                //'price' : parseInt(price),
+                "rating" : rating,
+                "gluten" : gluten,
+                "dairy" : dairy,
+                "vegan" : vegan,
+                "vegetarian" : vegetarian,
+                "halal" : halal
+            };
+            //console.log("price: " + price);
+            console.log("food name: " + food_name);
+            console.log("price: " + price);
+            console.log("vegetarian: " + vegetarian);
+            console.log("vegan: " + vegan); 
+            console.log("halal: " + halal); 
+            console.log(photoFormData);
+            photoFormData.set('description', JSON.stringify(json));
+            photoFormData.append('grp_id', 0);
+            $.ajax({
+                url: $path_to_backend + 'uploadPhoto.php',
+                type: 'POST',
+                data: photoFormData,
+                // responseType: 'application/json',
+
+                // some flags for jQuery
+                cache: false,
+                contentType: false,
+                processData: false,
+
+                // Custom XMLHttpRequest
+                xhr: function() {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        // For handling the progress of the upload
+                        myXhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                $('progress').attr({
+                                    value: e.loaded,
+                                    max: e.total,
+                                });
+                            }
+                        } , false);
+                    }
+                    return myXhr;
+                }
+            })
+            .done(function()
+            {
+                // let user know upload finished
+                alert("File uploaded!");
+                // refresh photos
+                //fetchPhotos();
+                // clear the upload form
+                $(':file').val('');
+                $('#description').val('');
+
+                //console.log(photoFormData)
+            /*if (foodDescription)
+            {
+                foodDescription["test"] = $(description)
+            }
+            else {
+                var foodDescription = 
+                {
+	                "food_name": "my food name",
+	                "res_name": "my restaurant name",
+	                "price": 10,
+	                "rating": 4,
+	                "gluten": true,
+	                "dairy": true,
+	                "vegan": true,
+	                "vegetarian": true,
+	                "halal": true
+                };
+
+                var string = JSON.stringify(foodDescription); 
+            }*/
+            });
+        });
+    </script>
+
+</body>
+</html>
+
